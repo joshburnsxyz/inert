@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/joshburnsxyz/inert#readme",
   "dependencies": {
-    "koa": "^2.14.1"
+    "koa": "^2.14.1",
+    "koa-static": "^5.0.0"
   }
 }
