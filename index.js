@@ -7,6 +7,14 @@ const app = new Koa;
 
 // Mount middleware
 app.use(serve(path.join(__dirname)));
+app.use(function(req, res, next){
+  console.log(req);
+  next();
+});
+app.use(function(req, res, next){
+  res.status(200);
+  next();
+});
 app.use(compress({
   br: true
 }));
