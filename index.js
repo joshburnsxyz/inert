@@ -20,4 +20,4 @@ app.use(compress({
 }));
 
 // Start server and listen for connections
-app.listen(3000);
+app.listen(3000, () => {console.log("Starting Inert - static asset delivery service.")});
