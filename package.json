@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/joshburnsxyz/inert/issues"
   },
-  "homepage": "https://github.com/joshburnsxyz/inert#readme"
+  "homepage": "https://github.com/joshburnsxyz/inert#readme",
+  "dependencies": {
+    "koa": "^2.14.1"
+  }
 }
