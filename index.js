@@ -12,11 +12,21 @@ const argv = yargs
 	  description: 'set server port to bind too',
 	  type: 'string'
       })
+      .option('dir', {
+	  alias: 'd',
+	  description: 'set directory to serve from (./public by default)',
+	  type: 'string'
+      })
       .help()
       .alias('help', 'h').argv;
 
 const app = new Koa;
-const myDir = path.join(__dirname, "./public");
+
+let myDir = path.join(__dirname, "./public");
+if (argv.dir) {
+    myDir = argv.dir;
+}
+
 let port = 3000;
 if (argv.port) {
     port = argv.port;
