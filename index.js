@@ -6,6 +6,7 @@ const fs = require("fs")
 
 const app = new Koa;
 const myDir = path.join(__dirname, "./public");
+const port = 3000;
 
 // Ensure public directory exists before booting server
 try{
@@ -31,7 +32,7 @@ app.use(compress({
 }));
 
 // Start server and listen for connections
-app.listen(3000, () => {
+app.listen(port, () => {
     console.log("Starting Inert - static asset delivery service.");
-    console.log("SERVER BOUND TO PORT 3000");
+    console.log(`SERVER BOUND TO PORT {port}`);
 });
