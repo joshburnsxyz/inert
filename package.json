@@ -4,6 +4,7 @@
   "description": "Simple static asset delivery server",
   "main": "index.js",
   "scripts": {
+    "yarn": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
