@@ -34,5 +34,5 @@ app.use(compress({
 // Start server and listen for connections
 app.listen(port, () => {
     console.log("Starting Inert - static asset delivery service.");
-    console.log(`SERVER BOUND TO PORT {port}`);
+    console.log("SERVER BOUND TO PORT "+port);
 });
