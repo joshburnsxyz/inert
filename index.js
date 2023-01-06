@@ -3,10 +3,24 @@ const serve = require("koa-static")
 const path = require("path")
 const compress = require("koa-compress")
 const fs = require("fs")
+const yargs = require("yargs")
+
+// Process command line
+const argv = yargs
+      .option('port', {
+	  alias: 'p',
+	  description: 'set server port to bind too',
+	  type: 'string'
+      })
+      .help()
+      .alias('help', 'h').argv;
 
 const app = new Koa;
 const myDir = path.join(__dirname, "./public");
-const port = 3000;
+let port = 3000;
+if (argv.port) {
+    port = argv.port;
+}
 
 // Ensure public directory exists before booting server
 try{
