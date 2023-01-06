@@ -6,7 +6,7 @@ const compress = require("koa-compress")
 const app = new Koa;
 
 // Mount middleware
-app.use(serve(path.join(__dirname)));
+app.use(serve(path.join(__dirname, "./public")));
 app.use(function(req, res, next){
   console.log(req);
   next();
