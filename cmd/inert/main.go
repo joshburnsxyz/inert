@@ -1,9 +1,10 @@
 package main
 
 import (
-  "fmt"
+  "log"
+  "net/http"
 )
 
 func main() {
-  fmt.Println("Inert Server")
+  log.Fatal(http.ListenAndServeTLS(":8443", "cert.pem", "key.pem", http.FileServer(http.Dir("./static"))))
 }
