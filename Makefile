@@ -13,3 +13,8 @@ inert:
 
 clean:
 	rm -rf dist
+
+ssl_keys:
+	mkdir -p dist
+	$(GOX) mod tidy
+	$(GOX) run ./cmd/generate_cert --host 0.0.0.0
