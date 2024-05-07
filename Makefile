@@ -12,7 +12,8 @@ inert:
 		./$(SRC)
 
 clean:
-	rm -rf dist
+	@rm -rf dist
+	@rm -f *.pem
 
 ssl_keys:
 	mkdir -p dist
