@@ -8,11 +8,11 @@ import (
 
 func makeFS(dir string) (http.HandlerFunc, error) {
 	var (
-	    htmlHead string = "<head>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"https://raw.githubusercontent.com/raj457036/attriCSS/master/themes/midnight-green.css\"/>\n</head>"
-	    err error
-	    handler http.HandlerFunc
+		err error
+		handler http.HandlerFunc
+	    htmlHead string = "<head>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.0/css/bulma.min.css\"/></head>"
 	)
-
+	
 	fs := http.FileServer(http.Dir(dir))
 
 	handler = func(w http.ResponseWriter, r *http.Request) {
@@ -21,26 +21,26 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 			isDir = url[len(url)-1] == '/'
 		)
 
-		// Create HTTP Server
-		
-		// If directory is found generate the page,
-		// and return the handler
 		if isDir {
 			err = nil
-			//w.Header().Set("Conent-Type", "text/html")
 			io.WriteString(w, "<!doctype HTML>")
 			io.WriteString(w, "\n")
-			io.WriteString(w, "<html>")
+			io.WriteString(w, "<html data-theme=\"dark\">")
+			io.WriteString(w, "\n")
 			io.WriteString(w, htmlHead)
 			io.WriteString(w, "\n")
 			io.WriteString(w, "<body>")
+			io.WriteString(w, "\n")
 			fs.ServeHTTP(w, r)
+			io.WriteString(w, "\n")
 			io.WriteString(w, "</body>")
+			io.WriteString(w, "\n")
 			io.WriteString(w, "</html>")
 		} else {
 			err = errors.New("Directory not found, could not generate HTTP handler.")
 		}
 
 	}
+
 	return handler,err
 }
