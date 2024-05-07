@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"html/template"
 	"os"
-	"log"
 )
 
 type fileRecord struct {
@@ -14,7 +13,6 @@ type fileRecord struct {
 }
 
 func makeFS(dir string) (http.HandlerFunc, error) {
-	fs := http.FileServer(http.Dir(dir))
 
 	// Build HTML template
 	tmpl, err := template.New("file_index").Parse(`
@@ -93,8 +91,6 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 				return
 			}
 			data.DirEntries = files
-			log.Println(data.DirEntries)
-			fs.ServeHTTP(w,r)
 		} else {
 			// FIXME: Serve the raw file instead of directory contents
 			data.Error = os.ErrNotExist
