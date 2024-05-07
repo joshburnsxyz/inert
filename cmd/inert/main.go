@@ -42,7 +42,10 @@ func main() {
   fmt.Println("Booting sever on", finalPort)
 
 	// Create FS Sever Handler
-	fsHandle := makeFS(flagDir)
+	fsHandle, err := makeFS(flagDir)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 
   // Boot Server with or without SSL support based on the "--ssl" flag
