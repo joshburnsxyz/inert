@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 type fileRecord struct {
@@ -21,7 +22,7 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Directory Listing</title>
+    <title>{{.PageTitle}}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.0/css/bulma.min.css">
     <style>
         body {
@@ -40,7 +41,7 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 <body>
 <div class="container">
     {{if .IsDir}}
-        <h1 class="title">Directory Listing</h1>
+        <h1 class="title">{{.PageTitle}}</h1>
         <ul class="menu-list">
             {{range .DirEntries}}
                 <li><a href="{{.Name}}" class="has-text-white">{{.Name}}</a></li>
@@ -68,14 +69,17 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 		}
 
 		// Build struct to hold data to populate the HTML template with.
+		pageTitle, _ := filepath.Abs(dir)
 		data := struct {
 			IsDir      bool
 			Error      error
 			DirEntries []fileRecord
+			PageTitle  string
 		}{
 			IsDir:      file.IsDir(),
 			Error:      nil,
 			DirEntries: nil,
+			PageTitle: pageTitle,
 		}
 
 		if file.IsDir() {
