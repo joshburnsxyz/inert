@@ -91,17 +91,16 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 				return
 			}
 			data.DirEntries = files
+			err = tmpl.Execute(w, data)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		} else {
-			// FIXME: Serve the raw file instead of directory contents
-			data.Error = os.ErrNotExist
+			fs := http.FileServer(http.Dir(dir))
+			fs.ServeHTTP(w,r)
 		}
 
-		// Populate template
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
 	}
 
 	// Upon success, return the handler and no error
