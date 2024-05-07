@@ -1,23 +1,23 @@
 package main
 
 import (
+	"errors"
 	"io"
 	"net/http"
-	"errors"
 )
 
 func makeFS(dir string) (http.HandlerFunc, error) {
 	var (
-		err error
-		handler http.HandlerFunc
-	    htmlHead string = "<head>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.0/css/bulma.min.css\"/></head>"
+		err      error
+		handler  http.HandlerFunc
+		htmlHead string = "<head>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.0/css/bulma.min.css\"/></head>"
 	)
-	
+
 	fs := http.FileServer(http.Dir(dir))
 
 	handler = func(w http.ResponseWriter, r *http.Request) {
 		var (
-			url = r.URL.Path
+			url   = r.URL.Path
 			isDir = url[len(url)-1] == '/'
 		)
 
@@ -42,5 +42,5 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 
 	}
 
-	return handler,err
+	return handler, err
 }
