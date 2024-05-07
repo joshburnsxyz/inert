@@ -23,22 +23,13 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 </head>
 <body>
 {{if .IsDir}}
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Size</th>
-        </tr>
-    </thead>
-    <tbody>
-        {{range .DirEntries}}
-        <tr>
-            <td><a href="{{.Name}}">{{.Name}}</a></td>
-            <td>{{.Size}}</td>
-        </tr>
-        {{end}}
-    </tbody>
-</table>
+    <div class="container">
+	<ul>
+	    {{range .DirEntries}}
+		<li><a href="{{.Name}}">{{.Name}}</a></li>
+	    {{end}}
+	</ul>
+    </div>
 {{else}}
 <h1>Error</h1>
 <p>{{.Error}}</p>
