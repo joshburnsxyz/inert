@@ -1,8 +1,8 @@
 package main
 
 import (
-	"net/http"
 	"html/template"
+	"net/http"
 	"os"
 )
 
@@ -47,12 +47,12 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 </html>
 `)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	// Build HTTP handler
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		file,err := os.Stat(dir + r.URL.Path)
+		file, err := os.Stat(dir + r.URL.Path)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -60,12 +60,12 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 
 		// Build struct to hold data to populate the HTML template with.
 		data := struct {
-			IsDir bool
-			Error error
+			IsDir      bool
+			Error      error
 			DirEntries []fileRecord
 		}{
-			IsDir: file.IsDir(),
-			Error: nil,
+			IsDir:      file.IsDir(),
+			Error:      nil,
 			DirEntries: nil,
 		}
 
@@ -75,7 +75,7 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 			var files []fileRecord
 
 			// Build a custom data struct so we can calculate the absolute path to the file
-			for _,d := range dirEntries {
+			for _, d := range dirEntries {
 				info, _ := d.Info()
 				new_file := fileRecord{
 					Name: d.Name(),
@@ -98,11 +98,11 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 			}
 		} else {
 			fs := http.FileServer(http.Dir(dir))
-			fs.ServeHTTP(w,r)
+			fs.ServeHTTP(w, r)
 		}
 
 	}
 
 	// Upon success, return the handler and no error
-	return handler,nil
+	return handler, nil
 }
