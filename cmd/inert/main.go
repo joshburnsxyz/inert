@@ -13,6 +13,7 @@ var (
 	flagCert string
 	flagKey  string
 	flagDir  string
+	flagHelp bool
 )
 
 func init() {
@@ -30,12 +31,25 @@ func init() {
 
 	// --dir, -d - Sets the path to the directory that will act as the root directory
 	flag.StringVarP(&flagDir, "dir", "d", "./static", "Directory to serve as root")
+
+	// --help, -h - Displays help message
+	flag.BoolVarP(&flagHelp, "help", "h", false, "Displays help message")
+
+	flag.Usage = func() {
+		fmt.Printf("Usage: inert [OPTIONS]\n\n")
+		flag.PrintDefaults()
+	}
 }
 
 func main() {
 
 	// Initialise flag values
 	flag.Parse()
+
+	if flagHelp {
+		flag.Usage()
+		return
+	}
 
 	// Create port string for HTTP(S) listener
 	finalPort := fmt.Sprintf(":%d", flagPort)
