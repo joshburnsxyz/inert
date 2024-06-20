@@ -8,13 +8,16 @@ import (
 )
 
 var (
-	flagPort int
-	flagSsl  bool
-	flagCert string
-	flagKey  string
-	flagDir  string
-	flagHelp bool
+	flagPort    int
+	flagSsl     bool
+	flagCert    string
+	flagKey     string
+	flagDir     string
+	flagHelp    bool
+	flagVersion bool
 )
+
+const INERT_VERSION = "0.1.0"
 
 func init() {
 	// --ssl - Enables SSL mode (requires --cert and --key to be present)
@@ -35,6 +38,9 @@ func init() {
 	// --help, -h - Displays help message
 	flag.BoolVarP(&flagHelp, "help", "h", false, "Displays help message")
 
+	// --version, -v - Displays version information
+	flag.BoolVarP(&flagVersion, "version", "v", false, "Displays version information")
+
 	flag.Usage = func() {
 		fmt.Printf("Usage: inert [OPTIONS]\n\n")
 		flag.PrintDefaults()
@@ -48,6 +54,11 @@ func main() {
 
 	if flagHelp {
 		flag.Usage()
+		return
+	}
+
+	if flagVersion {
+		fmt.Printf("Inert v%s\n", INERT_VERSION)
 		return
 	}
 
