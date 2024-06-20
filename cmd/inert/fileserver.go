@@ -13,6 +13,31 @@ type fileRecord struct {
 	Path string
 }
 
+type customError struct {
+	message string
+	code    int
+}
+
+func (e *customError) Error() string {
+	return e.message
+}
+
+func buildFileRecord(d os.DirEntry) (fileRecord, error) {
+	info, err := d.Info()
+	if err != nil {
+		return fileRecord{}, &customError{message: "failed to get file info", code: http.StatusInternalServerError}
+	}
+	return fileRecord{
+		Name: d.Name(),
+		Size: info.Size(),
+		Path: d.Name(),
+	}, nil
+}
+
+func calculateAbsolutePath(dir, path string) string {
+	return filepath.Join(dir, path)
+}
+
 func makeFS(dir string) (http.HandlerFunc, error) {
 
 	// Build HTML template
@@ -56,19 +81,20 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 </body>
 </html>
 `)
+
 	if err != nil {
-		return nil, err
+		return nil, &customError{message: "failed to parse template", code: http.StatusInternalServerError}
 	}
 
 	// Build HTTP handler
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		file, err := os.Stat(dir + r.URL.Path)
+		filePath := calculateAbsolutePath(dir, r.URL.Path)
+		file, err := os.Stat(filePath)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		// Build struct to hold data to populate the HTML template with.
 		pageTitle, _ := filepath.Abs(dir)
 		data := struct {
 			IsDir      bool
@@ -79,32 +105,28 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 			IsDir:      file.IsDir(),
 			Error:      nil,
 			DirEntries: nil,
-			PageTitle: pageTitle,
+			PageTitle:  pageTitle,
 		}
 
 		if file.IsDir() {
-			data.Error = nil
-			dirEntries, err := os.ReadDir(dir + r.URL.Path)
-			var files []fileRecord
-
-			// Build a custom data struct so we can calculate the absolute path to the file
-			for _, d := range dirEntries {
-				info, _ := d.Info()
-				new_file := fileRecord{
-					Name: d.Name(),
-					Size: info.Size(),
-					Path: d.Name(),
-				}
-				files = append(files, new_file)
-
-			}
-
+			dirEntries, err := os.ReadDir(filePath)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
+
+			var files []fileRecord
+			for _, d := range dirEntries {
+				record, err := buildFileRecord(d)
+				if err != nil {
+					http.Error(w, err.Error(), err.(*customError).code)
+					return
+				}
+				files = append(files, record)
+			}
+
 			data.DirEntries = files
-			err = tmpl.Execute(w, data)
+			err = tmpl.ExecuteTemplate(w, "file_index.html", data)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
@@ -113,7 +135,6 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 			fs := http.FileServer(http.Dir(dir))
 			fs.ServeHTTP(w, r)
 		}
-
 	}
 
 	// Upon success, return the handler and no error
