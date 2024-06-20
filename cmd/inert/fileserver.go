@@ -8,9 +8,10 @@ import (
 )
 
 type fileRecord struct {
-	Name string
-	Size int64
-	Path string
+	Name  string
+	Size  int64
+	Path  string
+	IsDir bool
 }
 
 type customError struct {
@@ -28,9 +29,10 @@ func buildFileRecord(d os.DirEntry) (fileRecord, error) {
 		return fileRecord{}, &customError{message: "failed to get file info", code: http.StatusInternalServerError}
 	}
 	return fileRecord{
-		Name: d.Name(),
-		Size: info.Size(),
-		Path: d.Name(),
+		Name:  d.Name(),
+		Size:  info.Size(),
+		Path:  d.Name(),
+		IsDir: info.IsDir(),
 	}, nil
 }
 
@@ -49,6 +51,7 @@ func makeFS(dir string) (http.HandlerFunc, error) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.PageTitle}}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.0/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
             padding-top: 40px;
@@ -61,6 +64,12 @@ func makeFS(dir string) (http.HandlerFunc, error) {
         .error {
             color: red;
         }
+        .file-icon {
+            color: #2196F3;
+        }
+        .folder-icon {
+            color: #FFC107;
+        }
     </style>
 </head>
 <body>
@@ -69,8 +78,15 @@ func makeFS(dir string) (http.HandlerFunc, error) {
         <h1 class="title">{{.PageTitle}}</h1>
         <ul class="menu-list">
             {{range .DirEntries}}
-                <li><a href="{{.Name}}" class="has-text-white">{{.Name}}</a></li>
-		<hr/>
+                <li>
+                    {{if .IsDir}}
+                        <i class="fas fa-folder folder-icon"></i>
+                    {{else}}
+                        <i class="fas fa-file file-icon"></i>
+                    {{end}}
+                    <a href="{{.Name}}" class="has-text-white">{{.Name}}</a>
+                </li>
+                <hr/>
             {{end}}
         </ul>
     {{else}}
@@ -126,7 +142,7 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 			}
 
 			data.DirEntries = files
-			err = tmpl.ExecuteTemplate(w, "file_index.html", data)
+			err = tmpl.Execute(w, data)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
