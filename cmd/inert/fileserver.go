@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 )
 
+// fileRecord represents a file or directory entry.
 type fileRecord struct {
 	Name  string
 	Size  int64
@@ -14,15 +15,19 @@ type fileRecord struct {
 	IsDir bool
 }
 
+// customError represents a custom error type.
 type customError struct {
 	message string
 	code    int
 }
 
+// Error returns the error message.
 func (e *customError) Error() string {
 	return e.message
 }
 
+// buildFileRecord builds a fileRecord from an os.DirEntry.
+// Returns a customError if there is an error getting file info.
 func buildFileRecord(d os.DirEntry) (fileRecord, error) {
 	info, err := d.Info()
 	if err != nil {
@@ -36,10 +41,16 @@ func buildFileRecord(d os.DirEntry) (fileRecord, error) {
 	}, nil
 }
 
+// calculateAbsolutePath calculates the absolute path of a file or directory.
 func calculateAbsolutePath(dir, path string) string {
 	return filepath.Join(dir, path)
 }
 
+// makeFS creates an HTTP handler that serves a directory listing.
+// The handler builds an HTML template and returns it as a response.
+// If the requested path is a directory, it lists its contents.
+// If the requested path is a file, it serves the file.
+// Returns a customError if there is an error parsing the template or getting file info.
 func makeFS(dir string) (http.HandlerFunc, error) {
 
 	// Build HTML template
@@ -84,18 +95,18 @@ func makeFS(dir string) (http.HandlerFunc, error) {
         <ul class="menu-list">
             {{range .DirEntries}}
                 <li>
-		    <div class="grid">
-			<div class="cell column-gap-1">
+		    <div class="columns">
+			<div class="column">
 			    {{if .IsDir}}
 				<i class="fas fa-folder folder-icon"></i>
 			    {{else}}
 				<i class="fas fa-file file-icon"></i>
 			    {{end}}
 			</div>
-			<div class="cell column-gap-1">
+			<div class="column is-four-fifths">
 			    <a href="{{.Name}}" class="has-text-white">{{.Name}}</a>
 			</div>
-			<div class="cell">
+			<div class="column">
                             {{if .IsDir}}
 			    {{else}}
 				<span>{{.Size}} bytes</span>
@@ -113,7 +124,7 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 </div>
 </body>
 </html>
-`)
+	`)
 
 	if err != nil {
 		return nil, &customError{message: "failed to parse template", code: http.StatusInternalServerError}
