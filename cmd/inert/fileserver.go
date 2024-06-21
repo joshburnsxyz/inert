@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"os"
@@ -28,7 +29,7 @@ func (e *customError) Error() string {
 
 // buildFileRecord builds a fileRecord from an os.DirEntry.
 // Returns a customError if there is an error getting file info.
-func buildFileRecord(d os.DirEntry) (fileRecord, error) {
+func buildFileRecord(dirPath string, d os.DirEntry) (fileRecord, error) {
 	info, err := d.Info()
 	if err != nil {
 		return fileRecord{}, &customError{message: "failed to get file info", code: http.StatusInternalServerError}
@@ -36,7 +37,7 @@ func buildFileRecord(d os.DirEntry) (fileRecord, error) {
 	return fileRecord{
 		Name:  d.Name(),
 		Size:  info.Size(),
-		Path:  d.Name(),
+		Path:  filepath.Join(dirPath, d.Name()),
 		IsDir: info.IsDir(),
 	}, nil
 }
@@ -94,26 +95,28 @@ func makeFS(dir string) (http.HandlerFunc, error) {
         <h1 class="title">{{.PageTitle}}</h1>
         <ul class="menu-list">
             {{range .DirEntries}}
-                <li>
-		    <div class="columns">
-			<div class="column">
-			    {{if .IsDir}}
-				<i class="fas fa-folder folder-icon"></i>
-			    {{else}}
-				<i class="fas fa-file file-icon"></i>
-			    {{end}}
+		<a href={{.Path}}>
+		    <li>
+			<div class="columns">
+			    <div class="column">
+				{{if .IsDir}}
+				    <i class="fas fa-folder folder-icon"></i>
+				{{else}}
+				    <i class="fas fa-file file-icon"></i>
+				{{end}}
+			    </div>
+			    <div class="column is-four-fifths">
+				{{.Name}}
+			    </div>
+			    <div class="column">
+				{{if .IsDir}}
+				{{else}}
+				    <span>{{.Size}} bytes</span>
+				{{end}}
+			    </div>
 			</div>
-			<div class="column is-four-fifths">
-			    <a href="{{.Name}}" class="has-text-white">{{.Name}}</a>
-			</div>
-			<div class="column">
-                            {{if .IsDir}}
-			    {{else}}
-				<span>{{.Size}} bytes</span>
-			    {{end}}
-			</div>
-		    </div>
-                </li>
+		    </li>
+		</a>
                 <hr/>
             {{end}}
         </ul>
@@ -161,7 +164,8 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 
 			var files []fileRecord
 			for _, d := range dirEntries {
-				record, err := buildFileRecord(d)
+				fmt.Println(r.URL)
+				record, err := buildFileRecord(r.URL.Path, d)
 				if err != nil {
 					http.Error(w, err.Error(), err.(*customError).code)
 					return
