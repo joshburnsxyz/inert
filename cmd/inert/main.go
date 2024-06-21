@@ -74,10 +74,10 @@ func main() {
 
 	// Boot Server with or without SSL support based on the "--ssl" flag
 	if flagSsl {
-		fmt.Println("SSL Mode enabled")
+		fmt.Println("Running in HTTPS mode")
 		log.Fatal(http.ListenAndServeTLS(finalPort, flagCert, flagKey, fsHandle))
 	} else {
-		fmt.Println("SSL Mode disabled")
+		fmt.Println("Running in HTTP mode")
 		log.Fatal(http.ListenAndServe(finalPort, fsHandle))
 	}
 }

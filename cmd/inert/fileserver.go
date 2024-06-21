@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -164,7 +164,6 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 
 			var files []fileRecord
 			for _, d := range dirEntries {
-				fmt.Println(r.URL)
 				record, err := buildFileRecord(r.URL.Path, d)
 				if err != nil {
 					http.Error(w, err.Error(), err.(*customError).code)
@@ -180,6 +179,19 @@ func makeFS(dir string) (http.HandlerFunc, error) {
 				return
 			}
 		} else {
+			// Set text/plain header to prevent files being downloaded when viewed
+			w.Header().Set("Content-Type", "text/plain")
+
+			file, err := os.Open(filePath)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			defer file.Close()
+
+			// Copy file contents to response body
+			io.Copy(w, file)
+
 			fs := http.FileServer(http.Dir(dir))
 			fs.ServeHTTP(w, r)
 		}
