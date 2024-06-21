@@ -64,6 +64,11 @@ func makeFS(dir string) (http.HandlerFunc, error) {
         .error {
             color: red;
         }
+	.file-icon .folder-icon {
+	    display: inline-block;
+	    vertical-align: middle;
+	    margin-right: 5px;
+	}
         .file-icon {
             color: #2196F3;
         }
@@ -79,12 +84,24 @@ func makeFS(dir string) (http.HandlerFunc, error) {
         <ul class="menu-list">
             {{range .DirEntries}}
                 <li>
-                    {{if .IsDir}}
-                        <i class="fas fa-folder folder-icon"></i>
-                    {{else}}
-                        <i class="fas fa-file file-icon"></i>
-                    {{end}}
-                    <a href="{{.Name}}" class="has-text-white">{{.Name}}</a>
+		    <div class="grid">
+			<div class="cell column-gap-1">
+			    {{if .IsDir}}
+				<i class="fas fa-folder folder-icon"></i>
+			    {{else}}
+				<i class="fas fa-file file-icon"></i>
+			    {{end}}
+			</div>
+			<div class="cell column-gap-1">
+			    <a href="{{.Name}}" class="has-text-white">{{.Name}}</a>
+			</div>
+			<div class="cell">
+                            {{if .IsDir}}
+			    {{else}}
+				<span>{{.Size}} bytes</span>
+			    {{end}}
+			</div>
+		    </div>
                 </li>
                 <hr/>
             {{end}}
