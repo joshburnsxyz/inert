@@ -13,7 +13,7 @@ Usage of inert:
 ```
 
 If you require a Self signed SSL certificate for testing purposes you can use `make ssl_keys` to generate a `cert.pem`
-and `key.pem` file that will allow you to run the server in SSL mode like so...
+and `key.pem` file (You can also obtain these via letsencrypt / certbot for production usage) that will allow you to run the server in SSL mode like so...
 
 ```
 $ inert --ssl -c ./cert.pem -k ./key.pem -d ./my_static_dir
